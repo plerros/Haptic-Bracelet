@@ -30,12 +30,29 @@ include(pico_sdk_import.cmake)
 
 project(firmware C CXX ASM)
 
+add_compile_options(-Wall -Wextra)
+
+# re-run cmake if config files change
+function(watch)
+    set_property(
+        DIRECTORY
+        APPEND
+        PROPERTY CMAKE_CONFIGURE_DEPENDS ${ARGV}
+    )
+endfunction()
+watch("${CMAKE_CURRENT_SOURCE_DIR}/config.h")
+watch("${CMAKE_CURRENT_SOURCE_DIR}/config_adv.h")
+
 # Initialise the Raspberry Pi Pico SDK
 pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(firmware main.c )
+add_executable(firmware
+    main.c
+    src/analog/analog.c
+    src/digital/digital.c
+    src/motor/motor.c)
 
 pico_set_program_name(firmware "firmware")
 pico_set_program_version(firmware "0.1")
@@ -46,15 +63,20 @@ pico_enable_stdio_usb(firmware 1)
 
 # Add the standard library to the build
 target_link_libraries(firmware
-        hardware_adc
-        hardware_gpio
-        hardware_pwm
-        pico_stdlib)
+    hardware_adc
+    hardware_gpio
+    hardware_pwm
+    pico_stdlib)
 
 # Add the standard include files to the build
 target_include_directories(firmware PRIVATE
-        ${CMAKE_CURRENT_LIST_DIR}
-)
+    ${CMAKE_CURRENT_LIST_DIR}
+    .
+    src
+    src/analog
+    src/digital
+    src/motor
+    lib)
 
 pico_add_extra_outputs(firmware)
 
