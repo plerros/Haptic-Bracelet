@@ -19,6 +19,11 @@
 #define PIN_AUX_DIGITAL 15
 #define PIN_AUX_ANALOG  26
 
-#define PRINTF printf
+/*
+ * PRINTF
+ *
+ * Can be either: 'printf' or 'nanoprintf'
+ */
+#define PRINTF nanoprintf
 
 #endif /* HAPTIC_BRACELET_CONFIG_H */

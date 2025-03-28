@@ -6,6 +6,7 @@
 
 #include <limits.h>
 #include <stdio.h>
+#include "../lib/nanoprintf.h"
 #include "hardware/adc.h"
 #include "pico/stdlib.h"
 #include "pico/time.h"

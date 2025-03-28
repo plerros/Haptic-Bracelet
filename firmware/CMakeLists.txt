@@ -30,6 +30,15 @@ include(pico_sdk_import.cmake)
 
 project(firmware C CXX ASM)
 
+# Link Time Optimization
+include(CheckIPOSupported)
+check_ipo_supported(RESULT IPO_SUPPORTED OUTPUT IPO_SUPPORT_OUTPUT)
+if (IPO_SUPPORTED)
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
+else ()
+    message(WARNING "LTO is not supported: ${IPO_SUPPORT_OUTPUT}")
+endif ()
+
 add_compile_options(-Wall -Wextra)
 
 # re-run cmake if config files change
@@ -80,3 +89,6 @@ target_include_directories(firmware PRIVATE
 
 pico_add_extra_outputs(firmware)
 
+target_compile_definitions(firmware PRIVATE
+	PICO_PANIC_FUNCTION=0
+)
