@@ -6,7 +6,7 @@
 
 #include <limits.h>
 #include <stdio.h>
-#include "../lib/nanoprintf.h"
+#include "../../lib/nanoprintf.h"
 #include "hardware/adc.h"
 #include "pico/stdlib.h"
 #include "pico/time.h"
@@ -142,6 +142,14 @@ static inline void test_pulse(struct bracelet_t *bracelet)
 	}
 	return;
 }
+
+/*
+ * test_battery:
+ *
+ * For pico-only battery life testing, simply unplug the motor.
+ * It could be done in software. I implemented it with a compile flag, but ultimately decided
+ * against it. Unplugging the motor on hardware is so simple and easy.
+ */
 
 static inline void test_battery(struct bracelet_t *bracelet)
 {

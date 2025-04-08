@@ -58,7 +58,7 @@ pico_sdk_init()
 # Add executable. Default name is the project name, version 0.1
 
 add_executable(firmware
-    main.c
+    src/main.c
     src/analog/analog.c
     src/digital/digital.c
     src/motor/motor.c)
