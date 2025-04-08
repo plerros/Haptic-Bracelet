@@ -61,6 +61,7 @@ add_executable(firmware
     src/main.c
     src/analog/analog.c
     src/digital/digital.c
+    src/led/led.c
     src/motor/motor.c)
 
 pico_set_program_name(firmware "firmware")
@@ -84,6 +85,7 @@ target_include_directories(firmware PRIVATE
     src
     src/analog
     src/digital
+    src/led
     src/motor
     lib)
 

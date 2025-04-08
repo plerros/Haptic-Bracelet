@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
+// External Libraries
 #include <limits.h>
 #include <stdio.h>
 #include "../../lib/nanoprintf.h"
@@ -11,36 +12,45 @@
 #include "pico/stdlib.h"
 #include "pico/time.h"
 
+// Config Files
 #include "config.h"
 #include "config_adv.h"
 
+// Internal Libraries
 #include "analog.h"
 #include "digital.h"
+#include "led.h"
 #include "motor.h"
 
 struct bracelet_t {
 	struct digital_t *button_pair;
 	struct digital_t *button_aux;
+	struct led_t     *status_led;
 	struct motor_t   *motor;
 };
 
 static inline void bracelet_init(struct bracelet_t *ptr, struct motor_parameters_t motor_parameters)
 {
-	PRINTF("Initializing board\n");
-	gpio_init(PIN_LED);
-	gpio_set_dir(PIN_LED, GPIO_OUT);
+	stdio_init_all();
+	sleep_ms(3000);
+	fflush(stdout);
 
+	PRINTF("[%6u] Init led\n", ms_now());
+	led_new(&(ptr->status_led), PIN_LED);
+	led_set(ptr->status_led, true);
+
+	PRINTF("[%6u] Init pair button\n", ms_now());
 	digital_new(&(ptr->button_pair), PIN_PAIR,        low_is_false);
-	digital_new(&(ptr->button_aux),  PIN_AUX_DIGITAL, low_is_false);
 
-	PRINTF("Initializing motor driver\n");
+	PRINTF("[%6u] Init motor\n", ms_now());
 	motor_new(&(ptr->motor), PIN_MOTOR_A1, PIN_MOTOR_A2, PIN_MOTOR_FAULT);
 	motor_set_parameters(ptr->motor, motor_parameters);
 
-	PRINTF("Initializing aux\n");
+	PRINTF("[%6u] Init aux\n", ms_now());
 	// todo later
+	digital_new(&(ptr->button_aux),  PIN_AUX_DIGITAL, low_is_false);
 
-	PRINTF("Initiated all\n");
+	PRINTF("[%6u] Init done\n", ms_now());
 }
 
 static inline void calibrate__brake_ms_max(struct bracelet_t *bracelet)
@@ -196,9 +206,6 @@ int main()
 		.brake_denominator = 3,
 		.brake_ms_max = 90
 	};
-
-	stdio_init_all();
-	sleep_ms(1000);
 
 	// Motor tuned values
 	bracelet_init(&bracelet, motor_parameters);

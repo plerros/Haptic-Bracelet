@@ -35,5 +35,12 @@
     "raspberry-pi-pico.cmakeAutoConfigure": true,
     "raspberry-pi-pico.useCmakeTools": false,
     "raspberry-pi-pico.cmakePath": "${HOME}/.pico-sdk/cmake/v3.31.5/bin/cmake",
-    "raspberry-pi-pico.ninjaPath": "${HOME}/.pico-sdk/ninja/v1.12.1/ninja"
+    "raspberry-pi-pico.ninjaPath": "${HOME}/.pico-sdk/ninja/v1.12.1/ninja",
+    "files.associations": {
+        "btstack_run_loop_embedded.h": "c",
+        "btstack_hci_transport_cyw43.h": "c",
+        "cyw43_arch.h": "c",
+        "inttypes.h": "c",
+        "stdlib.h": "c"
+    }
 }

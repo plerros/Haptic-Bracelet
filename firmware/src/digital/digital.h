@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2025 Pierro Zachareas
+ *
+ * SPDX-License-Identifier: GPL-3.0-only
+ */
+
 #ifndef HAPTIC_BRACELET_FIRMWARE_DIGITAL_H
 #define HAPTIC_BRACELET_FIRMWARE_DIGITAL_H
 
