@@ -11,7 +11,8 @@ typedef uint     pwm_t;
 typedef uint32_t ms_t;
 typedef uint16_t adc_t;
 
-#define ADC_MAX UINT16_MAX
+#define ADC_MAX ((1 << 12) - 1)
+#define ADC_PERCENT (ADC_MAX / 100)
 
 static inline ms_t ms_now()
 {

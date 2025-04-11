@@ -51,23 +51,23 @@ static inline void bracelet_init(struct bracelet_t *ptr, struct motor_parameters
 	sleep_ms(3000);
 	fflush(stdout);
 
-	PRINTF("[%6u] Init led\n", ms_now());
+	PRINTF("[%6ju] Init led\n", (uintmax_t)ms_now());
 	led_new(&(ptr->status_led), PIN_LED);
 	led_set(ptr->status_led, true);
 
-	PRINTF("[%6u] Init pair button\n", ms_now());
+	PRINTF("[%6ju] Init pair button\n", (uintmax_t)ms_now());
 	digital_new(&(ptr->button_pair), PIN_PAIR,        low_is_false);
 
-	PRINTF("[%6u] Init motor\n", ms_now());
+	PRINTF("[%6ju] Init motor\n", (uintmax_t)ms_now());
 	motor_new(&(ptr->motor), PIN_MOTOR_A1, PIN_MOTOR_A2, PIN_MOTOR_FAULT);
 	motor_set_parameters(ptr->motor, motor_parameters);
 
-	PRINTF("[%6u] Init aux\n", ms_now());
+	PRINTF("[%6ju] Init aux\n", (uintmax_t)ms_now());
 	digital_new(&(ptr->aux_connected), PIN_AUX_DETECT,  low_is_false);
 	digital_new(&(ptr->button_aux),    PIN_AUX_DIGITAL, low_is_false);
-	analog_new( &(ptr->radial_aux),    PIN_AUX_ANALOG,  ADCPIN_AUX_ANALOG, ADCMAX_AUX_ANALOG);
+	analog_new( &(ptr->radial_aux),    PIN_AUX_ANALOG,  ADC_CHANNEL_AUX_ANALOG);
 
-	PRINTF("[%6u] Init done\n", ms_now());
+	PRINTF("[%6ju] Init done\n", (uintmax_t)ms_now());
 }
 
 static inline void calibrate__brake_ms_max(struct bracelet_t *bracelet)
@@ -227,7 +227,7 @@ bool timer_callback(__unused repeating_timer_t *rt)
 		motor_pulse(bracelet.motor, 30);
 	}
 
-	if (analog_active(bracelet.radial_aux, 10)) {
+	if (analog_active(bracelet.radial_aux, 9)) {
 		motor_pulse(bracelet.motor, 30);
 	}
 
