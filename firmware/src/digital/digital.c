@@ -56,11 +56,17 @@ void digital_free(struct digital_t *ptr)
 	free(ptr);
 }
 
-void digital_update(struct digital_t *ptr)
+bool digital_now(struct digital_t *ptr)
 {
 	bool now = gpio_get(ptr->pin);
 	if (ptr->invert)
 		now = !now;
+	return now;
+}
+
+void digital_update(struct digital_t *ptr)
+{
+	bool now = digital_now(ptr);
 
 	// Update trap
 	if (now == true)

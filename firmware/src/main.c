@@ -23,15 +23,31 @@
 #include "motor.h"
 
 struct bracelet_t {
-	struct digital_t *button_pair;
-	struct digital_t *button_aux;
+	// On board
 	struct led_t     *status_led;
+	struct digital_t *button_pair;
+
+	// Motor
 	struct motor_t   *motor;
+
+	// Aux
+	struct digital_t *aux_connected;
+	struct digital_t *button_aux;
+	struct analog_t  *radial_aux;
 };
 
 static inline void bracelet_init(struct bracelet_t *ptr, struct motor_parameters_t motor_parameters)
 {
+	ptr->status_led    = NULL;
+	ptr->button_pair   = NULL;
+
+	ptr->motor         = NULL;
+
+	ptr->aux_connected = NULL;
+	ptr->button_aux    = NULL;
+
 	stdio_init_all();
+	adc_init();
 	sleep_ms(3000);
 	fflush(stdout);
 
@@ -47,8 +63,9 @@ static inline void bracelet_init(struct bracelet_t *ptr, struct motor_parameters
 	motor_set_parameters(ptr->motor, motor_parameters);
 
 	PRINTF("[%6u] Init aux\n", ms_now());
-	// todo later
-	digital_new(&(ptr->button_aux),  PIN_AUX_DIGITAL, low_is_false);
+	digital_new(&(ptr->aux_connected), PIN_AUX_DETECT,  low_is_false);
+	digital_new(&(ptr->button_aux),    PIN_AUX_DIGITAL, low_is_false);
+	analog_new( &(ptr->radial_aux),    PIN_AUX_ANALOG,  ADCPIN_AUX_ANALOG, ADCMAX_AUX_ANALOG);
 
 	PRINTF("[%6u] Init done\n", ms_now());
 }
@@ -191,9 +208,29 @@ struct bracelet_t bracelet = {
 
 bool timer_callback(__unused repeating_timer_t *rt)
 {
+	// On Board
+	led_update(bracelet.status_led);
 	digital_update(bracelet.button_pair);
-	digital_update(bracelet.button_aux);
+
+	// Motor
 	motor_update(bracelet.motor);
+
+	// Aux
+	digital_update(bracelet.aux_connected);
+
+	if (digital_now(bracelet.aux_connected)) {
+		digital_update(bracelet.button_aux);
+		analog_update(bracelet.radial_aux);
+	}
+
+	if (digital_active(bracelet.button_aux)) {
+		motor_pulse(bracelet.motor, 30);
+	}
+
+	if (analog_active(bracelet.radial_aux, 10)) {
+		motor_pulse(bracelet.motor, 30);
+	}
+
 	return true;
 }
 

@@ -19,6 +19,9 @@
 #define PIN_AUX_DIGITAL 15
 #define PIN_AUX_ANALOG  26
 
+#define ADCPIN_AUX_ANALOG 0
+#define ADCMAX_AUX_ANALOG 3600
+
 /*
  * PRINTF
  *

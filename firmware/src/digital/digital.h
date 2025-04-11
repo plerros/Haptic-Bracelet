@@ -18,6 +18,8 @@ struct digital_t;
 void digital_new(struct digital_t **ptr, uint pin, int type);
 void digital_update(struct digital_t *ptr);
 
+bool digital_now(struct digital_t *ptr);
+
 /*
  * digital_trap:
  *

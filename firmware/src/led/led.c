@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-//
-
 #include <stdlib.h>
 #include "hardware/gpio.h"
 #include "pico/stdlib.h"
@@ -46,8 +44,6 @@ void led_new(struct led_t **ptr, uint pin)
 void led_set(struct led_t *ptr, bool value)
 {
 	ms_t now = ms_now();
-
-	printf("putting pin %u to value %u\n", ptr->pin, (uint) value);
 	gpio_put(ptr->pin, value);
 	ptr->state = value;
 	ptr->state_since = now;

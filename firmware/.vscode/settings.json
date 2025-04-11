@@ -41,6 +41,9 @@
         "btstack_hci_transport_cyw43.h": "c",
         "cyw43_arch.h": "c",
         "inttypes.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "charconv": "c",
+        "random": "c",
+        "limits": "c"
     }
 }

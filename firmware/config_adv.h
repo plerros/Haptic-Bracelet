@@ -9,6 +9,9 @@
 
 typedef uint     pwm_t;
 typedef uint32_t ms_t;
+typedef uint16_t adc_t;
+
+#define ADC_MAX UINT16_MAX
 
 static inline ms_t ms_now()
 {
