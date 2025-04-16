@@ -20,7 +20,8 @@ struct digital_t {
 
 	// External
 	volatile bool trap;
-	volatile bool clicked;
+	volatile bool went_true;
+	volatile bool went_false;
 	volatile ms_t held_for;
 };
 
@@ -45,7 +46,8 @@ void digital_new(struct digital_t **ptr, uint pin, int type)
 
 	new->prev = false;
 	new->trap = false;
-	new->clicked = false;
+	new->went_true = false;
+	new->went_false = false;
 	new->held_for = 0;
 
 	*ptr = new;
@@ -72,14 +74,15 @@ void digital_update(struct digital_t *ptr)
 	if (now == true)
 		ptr->trap = now;
 
-	// Update clicked
+	// If we transition {false -> true}
 	if (ptr->prev == false && now == true) {
-		ptr->clicked = true;
+		ptr->went_true = true;
 		ptr->held_since = ms_now();
 	}
 
-	// Update held for
+	// If we transition {true -> false}
 	if (ptr->prev == true && now == false) {
+		ptr->went_false = true;
 		ms_t tmp = ms_now() - ptr->held_since;
 		if (tmp >= 1000)
 			ptr->held_for = tmp;
@@ -93,10 +96,17 @@ bool digital_trap(struct digital_t *ptr)
 	return ptr->trap;
 }
 
-bool digital_active(struct digital_t *ptr)
+bool digital_went_true(struct digital_t *ptr)
 {
-	bool ret = ptr->clicked;
-	ptr->clicked = false;
+	bool ret = ptr->went_true;
+	ptr->went_true = false;
+	return ret;
+}
+
+bool digital_went_false(struct digital_t *ptr)
+{
+	bool ret = ptr->went_false;
+	ptr->went_false = false;
 	return ret;
 }
 

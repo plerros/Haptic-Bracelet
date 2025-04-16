@@ -95,7 +95,7 @@ void motor_set_parameters(struct motor_t *ptr, struct motor_parameters_t paramet
 void motor_update(struct motor_t *ptr)
 {
 	digital_update(ptr->fault);
-	if (digital_active(ptr->fault)) {
+	if (digital_went_true(ptr->fault)) {
 		//error
 	}
 

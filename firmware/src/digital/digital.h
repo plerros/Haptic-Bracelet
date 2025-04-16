@@ -28,11 +28,18 @@ bool digital_now(struct digital_t *ptr);
 bool digital_trap(struct digital_t *ptr);
 
 /*
- * digital_activated:
+ * digital_went_true:
  *
- * Is there an activation of this pin that I haven't consumed?
+ * Is there a transition {false -> true} of this pin that I haven't consumed?
  */
-bool digital_active(struct digital_t *ptr);
+bool digital_went_true(struct digital_t *ptr);
+
+/*
+ * digital_went_false:
+ *
+ * Is there a transition {true -> false} of this pin that I haven't consumed?
+ */
+bool digital_went_false(struct digital_t *ptr);
 
 ms_t digital_ms(struct digital_t *ptr);
 

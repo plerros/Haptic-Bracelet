@@ -158,7 +158,7 @@ static inline void test_pulse(struct bracelet_t *bracelet)
 {
 	int pulses = 0;
 	while (true) {
-		if (digital_active(bracelet->button_pair)) {
+		if (digital_went_true(bracelet->button_pair)) {
 			PRINTF("+20 pulses\n");
 			pulses = 20;
 		}
@@ -206,6 +206,30 @@ struct bracelet_t bracelet = {
 	.motor = NULL
 };
 
+static inline void bracelet_pulse(struct bracelet_t *ptr)
+{
+	ms_t ms = 0;
+
+	if (digital_went_true(ptr->button_aux)) {
+		ms = 30;
+		goto out;
+	}
+
+	if (digital_went_false(ptr->button_aux)) {
+		ms = 20;
+		goto out;
+	}
+
+	if (analog_active(ptr->radial_aux, 9)) {
+		ms = 30;
+		goto out;
+	}
+
+out:
+	if (ms > 0)
+		motor_pulse(ptr->motor, ms);
+}
+
 bool timer_callback(__unused repeating_timer_t *rt)
 {
 	#if MEASURE_CALLBACK_TIME
@@ -227,13 +251,7 @@ bool timer_callback(__unused repeating_timer_t *rt)
 		analog_update(bracelet.radial_aux);
 	}
 
-	if (digital_active(bracelet.button_aux)) {
-		motor_pulse(bracelet.motor, 30);
-	}
-
-	if (analog_active(bracelet.radial_aux, 9)) {
-		motor_pulse(bracelet.motor, 30);
-	}
+	bracelet_pulse(&bracelet);
 
 	#if MEASURE_CALLBACK_TIME
 	us_t time_difference = us_now() - start;
