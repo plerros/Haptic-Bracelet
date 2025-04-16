@@ -28,4 +28,6 @@
  */
 #define PRINTF nanoprintf
 
+#define ANALOG_AVERAGING_WINDOW 64
+
 #endif /* HAPTIC_BRACELET_CONFIG_H */
