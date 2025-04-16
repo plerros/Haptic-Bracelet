@@ -135,6 +135,9 @@ void motor_update(struct motor_t *ptr)
 
 void motor_pulse(struct motor_t *ptr, ms_t ms)
 {
+	if (ptr->state != motor_asleep)
+		return;
+
 	ptr->brake_ms = ms / ptr->parameters.brake_denominator;
 	if (ptr->brake_ms > ptr->parameters.brake_ms_max)
 		ptr->brake_ms = ptr->parameters.brake_ms_max;
