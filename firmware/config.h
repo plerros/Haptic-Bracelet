@@ -6,7 +6,9 @@
 
 #ifndef HAPTIC_BRACELET_CONFIG_H
 #define HAPTIC_BRACELET_CONFIG_H
- 
+
+#include <stdbool.h>
+
 // Pins
 #define PIN_LED         19
 #define PIN_PAIR        18
@@ -29,5 +31,7 @@
 #define PRINTF nanoprintf
 
 #define ANALOG_AVERAGING_WINDOW 64
+
+#define MEASURE_CALLBACK_TIME false
 
 #endif /* HAPTIC_BRACELET_CONFIG_H */

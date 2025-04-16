@@ -22,6 +22,7 @@ struct analog_t {
 
 	volatile adc_t  raw_values[ANALOG_AVERAGING_WINDOW];
 	volatile size_t last_written;
+	volatile uint32_t avg_sum;
 
 	volatile adc_t prev[ap_size];
 
@@ -31,24 +32,22 @@ struct analog_t {
 static inline void analog_read(struct analog_t *ptr)
 {
 	adc_select_input(ptr->adc_id);
-	
-	if (ptr->last_written >= ANALOG_AVERAGING_WINDOW - 1) {
-		ptr->last_written = 0;
-	} else {
-		ptr->last_written++;
-	}
+	adc_t value = adc_read();
 
-	ptr->raw_values[ptr->last_written] = adc_read();
+	size_t i = ptr->last_written;
+	size_t i_next = 0;
+	if (i < ANALOG_AVERAGING_WINDOW - 1)
+		i_next = i + 1;
+
+	ptr->avg_sum -= ptr->raw_values[i_next];
+	ptr->raw_values[i_next] = value;
+	ptr->avg_sum += value;
+	ptr->last_written = i_next;
 }
 
 static inline adc_t analog_avg_now(struct analog_t *ptr)
 {
-	uint32_t now = 0;
-	for (size_t i = 0; i < ANALOG_AVERAGING_WINDOW; i++)
-		now += ptr->raw_values[i];
-
-	now /= ANALOG_AVERAGING_WINDOW;
-	return now;
+	return (ptr->avg_sum / ANALOG_AVERAGING_WINDOW);
 }
 
 static inline void analog_reset(struct analog_t *ptr)
@@ -71,6 +70,13 @@ void analog_new(struct analog_t **ptr, uint pin, uint adc_id)
 	adc_gpio_init(new->pin);
 
 	new->adc_id = adc_id;
+
+	new->avg_sum = 0;
+	for (size_t i = 0; i < ANALOG_AVERAGING_WINDOW; i++) {
+		new->raw_values[i] = 0;
+		new->last_written = i;
+	}
+
 	for (size_t i = 0; i < ANALOG_AVERAGING_WINDOW; i++)
 		analog_read(new);
 

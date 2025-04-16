@@ -208,6 +208,10 @@ struct bracelet_t bracelet = {
 
 bool timer_callback(__unused repeating_timer_t *rt)
 {
+	#if MEASURE_CALLBACK_TIME
+	us_t start = us_now();
+	#endif
+
 	// On Board
 	led_update(bracelet.status_led);
 	digital_update(bracelet.button_pair);
@@ -230,6 +234,12 @@ bool timer_callback(__unused repeating_timer_t *rt)
 	if (analog_active(bracelet.radial_aux, 9)) {
 		motor_pulse(bracelet.motor, 30);
 	}
+
+	#if MEASURE_CALLBACK_TIME
+	us_t time_difference = us_now() - start;
+	if (time_difference != 0)
+		PRINTF("%ju\n", (uintmax_t)time_difference);
+	#endif
 
 	return true;
 }
