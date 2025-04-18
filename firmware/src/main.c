@@ -7,7 +7,7 @@
 // External Libraries
 #include <limits.h>
 #include <stdio.h>
-#include "../../lib/nanoprintf.h"
+#include "npf_interface.h"
 #include "hardware/adc.h"
 #include "pico/stdlib.h"
 #include "pico/time.h"
@@ -36,6 +36,11 @@ struct bracelet_t {
 	struct analog_t  *radial_aux;
 };
 
+static inline void print_timestamp()
+{
+	PRINTF("[%6ju] ", (uintmax_t)ms_now());
+}
+
 static inline void bracelet_init(struct bracelet_t *ptr, struct motor_parameters_t motor_parameters)
 {
 	ptr->status_led    = NULL;
@@ -51,23 +56,28 @@ static inline void bracelet_init(struct bracelet_t *ptr, struct motor_parameters
 	sleep_ms(3000);
 	fflush(stdout);
 
-	PRINTF("[%6ju] Init led\n", (uintmax_t)ms_now());
+	print_timestamp();
+	PRINTF("Init led\n");
 	led_new(&(ptr->status_led), PIN_LED);
 	led_set(ptr->status_led, true);
 
-	PRINTF("[%6ju] Init pair button\n", (uintmax_t)ms_now());
+	print_timestamp();
+	PRINTF("Init pair button\n");
 	digital_new(&(ptr->button_pair), PIN_PAIR,        low_is_false);
 
-	PRINTF("[%6ju] Init motor\n", (uintmax_t)ms_now());
+	print_timestamp();
+	PRINTF("Init motor\n");
 	motor_new(&(ptr->motor), PIN_MOTOR_A1, PIN_MOTOR_A2, PIN_MOTOR_FAULT);
 	motor_set_parameters(ptr->motor, motor_parameters);
 
-	PRINTF("[%6ju] Init aux\n", (uintmax_t)ms_now());
+	print_timestamp();
+	PRINTF("Init aux\n");
 	digital_new(&(ptr->aux_connected), PIN_AUX_DETECT,  low_is_false);
 	digital_new(&(ptr->button_aux),    PIN_AUX_DIGITAL, low_is_false);
 	analog_new( &(ptr->radial_aux),    PIN_AUX_ANALOG,  ADC_CHANNEL_AUX_ANALOG);
 
-	PRINTF("[%6ju] Init done\n", (uintmax_t)ms_now());
+	print_timestamp();
+	PRINTF("Init done\n");
 }
 
 static inline void calibrate__brake_ms_max(struct bracelet_t *bracelet)
