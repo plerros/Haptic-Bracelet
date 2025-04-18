@@ -59,7 +59,7 @@
 
 static inline void print_timestamp()
 {
-	PRINTF("[%6ju] ", (uintmax_t)ms_now());
+	PRINTF("[%8ju] ", (uintmax_t)ms_now());
 }
 
 // TODO read USB HID Specification 1.1, Appendix B.2 and validate the following:
@@ -106,7 +106,7 @@ const uint8_t adv_data[] = {
 	// Name
 	0x0b, BLUETOOTH_DATA_TYPE_COMPLETE_LOCAL_NAME, 'H', 'I', 'D', ' ', 'H', 'a', 'p', 't', 'i', 'c',
 	// 16-bit Service UUIDs
-	0x03, BLUETOOTH_DATA_TYPE_COMPLETE_LIST_OF_16_BIT_SERVICE_CLASS_UUIDS, ORG_BLUETOOTH_SERVICE_HUMAN_INTERFACE_DEVICE & 0xff, ORG_BLUETOOTH_SERVICE_HUMAN_INTERFACE_DEVICE >> 8,
+	//0x03, BLUETOOTH_DATA_TYPE_COMPLETE_LIST_OF_16_BIT_SERVICE_CLASS_UUIDS, ORG_BLUETOOTH_SERVICE_HUMAN_INTERFACE_DEVICE & 0xff, ORG_BLUETOOTH_SERVICE_HUMAN_INTERFACE_DEVICE >> 8,
 	// Appearance HID - Gamepad (Category 15, Sub-Category 4)
 	0x03, BLUETOOTH_DATA_TYPE_APPEARANCE, 0xC4, 0x03,
 };

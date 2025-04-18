@@ -14,6 +14,8 @@ typedef uint32_t ms_t;
 typedef uint64_t us_t;
 typedef uint16_t adc_t;
 
+typedef uint     percent_t;
+
 #define ADC_MAX ((1 << 12) - 1)
 #define ADC_PERCENT (ADC_MAX / 100)
 

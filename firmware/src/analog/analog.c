@@ -26,6 +26,8 @@ struct analog_t {
 
 	volatile adc_t prev[ap_size];
 
+	volatile ms_t  activation1_time;
+	bool           activation2_consumed;
 	// External
 };
 
@@ -82,6 +84,8 @@ void analog_new(struct analog_t **ptr, uint pin, uint adc_id)
 
 	analog_reset(new);
 
+	new->activation1_time     = 0;
+	new->activation2_consumed = true;
 	*ptr = new;
 }
 
@@ -114,5 +118,19 @@ bool analog_active(struct analog_t *ptr, adc_t threshold_percent)
 		return false;
 
 	analog_reset(ptr);
+	ptr->activation1_time = ms_now();
+
 	return true;
+}
+
+bool analog_active2(struct analog_t *ptr, ms_t before)
+{
+	if (ptr->activation2_consumed == true)
+		return false;
+
+	if (ms_now() > ptr->activation1_time + before) {
+		ptr->activation2_consumed = true;
+		return true;
+	}
+	return false;
 }

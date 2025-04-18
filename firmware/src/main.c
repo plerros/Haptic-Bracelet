@@ -39,7 +39,7 @@ struct bracelet_t {
 
 static inline void print_timestamp()
 {
-	PRINTF("[%6ju] ", (uintmax_t)ms_now());
+	PRINTF("[%8ju] ", (uintmax_t)ms_now());
 }
 
 static inline void bracelet_init(struct bracelet_t *ptr, struct motor_parameters_t motor_parameters)
@@ -223,20 +223,28 @@ struct bracelet_t bracelet = {
 
 static inline void bracelet_pulse(struct bracelet_t *ptr)
 {
+	// Don't consume
+	if (motor_get_state(ptr->motor) != motor_asleep)
+		return;
+
 	ms_t ms = 0;
 
 	if (digital_went_true(ptr->button_aux)) {
-		ms = 30;
-		goto out;
-	}
-
-	if (digital_went_false(ptr->button_aux)) {
 		ms = 20;
 		goto out;
 	}
 
-	if (analog_active(ptr->radial_aux, 9)) {
-		ms = 30;
+	if (digital_went_false(ptr->button_aux)) {
+		ms = 10;
+		goto out;
+	}
+
+	if (analog_active(ptr->radial_aux, 5)) {
+		ms = 10;
+		goto out;
+	}
+	if (analog_active2(ptr->radial_aux, 20)) {
+		ms = 10;
 		goto out;
 	}
 
