@@ -34,7 +34,7 @@ project(firmware C CXX ASM)
 include(CheckIPOSupported)
 check_ipo_supported(RESULT IPO_SUPPORTED OUTPUT IPO_SUPPORT_OUTPUT)
 if (IPO_SUPPORTED)
-    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
+    #set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
 else ()
     message(WARNING "LTO is not supported: ${IPO_SUPPORT_OUTPUT}")
 endif ()
@@ -61,8 +61,10 @@ add_executable(firmware
     src/main.c
     src/analog/analog.c
     src/digital/digital.c
+    src/hog_haptic/hog_haptic.c
     src/led/led.c
-    src/motor/motor.c)
+    src/motor/motor.c
+    src/npf_interface/npf_interface.c)
 
 pico_set_program_name(firmware "firmware")
 pico_set_program_version(firmware "0.1")
@@ -76,6 +78,9 @@ target_link_libraries(firmware
     hardware_adc
     hardware_gpio
     hardware_pwm
+    pico_btstack_ble
+    pico_btstack_cyw43
+    pico_cyw43_arch_none
     pico_stdlib)
 
 # Add the standard include files to the build
@@ -85,12 +90,15 @@ target_include_directories(firmware PRIVATE
     src
     src/analog
     src/digital
+    src/hog_haptic
     src/led
     src/motor
+    src/npf_interface
     lib)
 
 pico_add_extra_outputs(firmware)
 
-target_compile_definitions(firmware PRIVATE
-	PICO_PANIC_FUNCTION=0
+target_compile_definitions(firmware
+    PRIVATE PICO_PANIC_FUNCTION=0
+    PRIVATE CYW43_ENABLE_BLUETOOTH=1
 )

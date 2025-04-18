@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include "npf_interface.h"
 #include "hardware/adc.h"
+#include "pico/cyw43_arch.h"
 #include "pico/stdlib.h"
 #include "pico/time.h"
 
@@ -75,6 +76,10 @@ static inline void bracelet_init(struct bracelet_t *ptr, struct motor_parameters
 	digital_new(&(ptr->aux_connected), PIN_AUX_DETECT,  low_is_false);
 	digital_new(&(ptr->button_aux),    PIN_AUX_DIGITAL, low_is_false);
 	analog_new( &(ptr->radial_aux),    PIN_AUX_ANALOG,  ADC_CHANNEL_AUX_ANALOG);
+
+	//print_timestamp();
+	//PRINTF("Init pair bluetooth\n");
+	cyw43_arch_init();
 
 	print_timestamp();
 	PRINTF("Init done\n");
@@ -272,6 +277,7 @@ bool timer_callback(__unused repeating_timer_t *rt)
 	return true;
 }
 
+extern int btstack_main(void);
 int main()
 {
 	struct motor_parameters_t motor_parameters = {
@@ -290,5 +296,6 @@ int main()
 	if (!rc)
 		return 1;
 	
-	calibrate_denominator(&bracelet, motor_parameters);
+	btstack_main();
+	test_battery(&bracelet);
 }

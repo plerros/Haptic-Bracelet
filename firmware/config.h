@@ -28,7 +28,7 @@
  *
  * Can be either: 'printf' or 'nanoprintf'
  */
-#define PRINTF nanoprintf
+#define PRINTF printf
 
 #define ANALOG_AVERAGING_WINDOW 64
 
