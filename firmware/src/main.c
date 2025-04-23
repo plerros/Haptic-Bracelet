@@ -20,6 +20,7 @@
 // Internal Libraries
 #include "analog.h"
 #include "digital.h"
+#include "bluetooth_states.h"
 #include "led.h"
 #include "motor.h"
 
@@ -27,6 +28,7 @@ struct bracelet_t {
 	// On board
 	struct led_t     *status_led;
 	struct digital_t *button_pair;
+	int		  hog_state;
 
 	// Motor
 	struct motor_t   *motor;
@@ -216,10 +218,26 @@ static inline void test_battery(struct bracelet_t *bracelet)
 }
 
 struct bracelet_t bracelet = {
-	.button_pair = NULL,
-	.button_aux = NULL,
-	.motor = NULL
+	.status_led    = NULL,
+	.button_pair   = NULL,
+	.hog_state     = bt_disconnected,
+	.motor         = NULL,
+	.aux_connected = NULL,
+	.button_aux    = NULL,
+	.radial_aux    = NULL
 };
+
+struct led_t     *status_led;
+struct digital_t *button_pair;
+int		  hog_state;
+
+// Motor
+struct motor_t   *motor;
+
+// Aux
+struct digital_t *aux_connected;
+struct digital_t *button_aux;
+struct analog_t  *radial_aux;
 
 static inline void bracelet_pulse(struct bracelet_t *ptr)
 {
@@ -240,11 +258,11 @@ static inline void bracelet_pulse(struct bracelet_t *ptr)
 	}
 
 	if (analog_active(ptr->radial_aux, 5)) {
-		ms = 10;
+		ms = 15;
 		goto out;
 	}
 	if (analog_active2(ptr->radial_aux, 20)) {
-		ms = 10;
+		ms = 15;
 		goto out;
 	}
 
@@ -260,6 +278,12 @@ bool timer_callback(__unused repeating_timer_t *rt)
 	#endif
 
 	// On Board
+	if (bracelet.hog_state == bt_disconnected) {
+		led_set_pulse(bracelet.status_led, 1000);
+	} else {
+		led_set(bracelet.status_led, true);
+	}
+
 	led_update(bracelet.status_led);
 	digital_update(bracelet.button_pair);
 
@@ -285,7 +309,7 @@ bool timer_callback(__unused repeating_timer_t *rt)
 	return true;
 }
 
-extern int btstack_main(void);
+extern int btstack_main(volatile int* hog_state);
 int main()
 {
 	struct motor_parameters_t motor_parameters = {
@@ -304,6 +328,6 @@ int main()
 	if (!rc)
 		return 1;
 	
-	btstack_main();
+	btstack_main(&(bracelet.hog_state));
 	test_battery(&bracelet);
 }

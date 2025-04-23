@@ -44,6 +44,7 @@
         "stdlib.h": "c",
         "charconv": "c",
         "random": "c",
-        "limits": "c"
+        "limits": "c",
+        "analog.h": "c"
     }
 }

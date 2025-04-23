@@ -56,6 +56,7 @@
 #include "config_adv.h"
 
 #include "npf_interface.h"
+#include "bluetooth_states.h"
 
 static inline void print_timestamp()
 {
@@ -68,7 +69,7 @@ const uint8_t hid_descriptor_haptic[] = {
 	0x09, 0x05,                   // USAGE (Game Pad)
 	0xa1, 0x01,                   // COLLECTION (Application)
 	0xa1, 0x02,                   //    COLLECTION (Logical)
-	0x85, 0x30,                    //      REPORT_ID (48)
+	0x85, 0x30,                   //      REPORT_ID (48)
 
 	0x75, 0x08,                   //      REPORT_SIZE (8)
 	0x95, 0x02,                   //      REPORT_COUNT (2)
@@ -97,6 +98,7 @@ static btstack_packet_callback_registration_t sm_event_callback_registration;
 static uint8_t battery = 100;
 static hci_con_handle_t con_handle = HCI_CON_HANDLE_INVALID;
 static uint8_t protocol_mode = 1;
+volatile int *state = NULL;
 
 static void packet_handler(uint8_t packet_type, uint16_t channel, uint8_t *packet, uint16_t size);
 
@@ -204,6 +206,7 @@ static void packet_handler (uint8_t packet_type, uint16_t channel, uint8_t *pack
 			print_timestamp();
 			print_ble();
 			PRINTF("Disconnected\n");
+			*state = bt_disconnected;
 			break;
 		case SM_EVENT_JUST_WORKS_REQUEST:
 			print_timestamp();
@@ -237,6 +240,7 @@ static void packet_handler (uint8_t packet_type, uint16_t channel, uint8_t *pack
 					PRINTF("LE Connection Complete:\n");
 					PRINTF("- Connection Interval: %u.%02u ms\n", conn_interval * 125 / 100, 25 * (conn_interval & 3));
 					PRINTF("- Connection Latency: %u\n", gap_subevent_le_connection_complete_get_conn_latency(packet));
+					*state = bt_connected;
 					break;
 				default:
 					break;
@@ -293,11 +297,11 @@ static void packet_handler (uint8_t packet_type, uint16_t channel, uint8_t *pack
 	}
 }
 
-int btstack_main(void);
-int btstack_main(void)
+int btstack_main(volatile int* hog_state)
 {
 	print_timestamp();
 	PRINTF("Reached btstack_main()\n");
+	state = hog_state;
 	hog_haptic_setup();
 	hci_power_control(HCI_POWER_ON);
 

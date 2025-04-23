@@ -41,12 +41,18 @@ void led_new(struct led_t **ptr, uint pin)
 	(*ptr) = new;
 }
 
-void led_set(struct led_t *ptr, bool value)
+static inline void led_set_internal(struct led_t *ptr, bool value)
 {
 	ms_t now = ms_now();
 	gpio_put(ptr->pin, value);
 	ptr->state = value;
 	ptr->state_since = now;
+}
+
+void led_set(struct led_t *ptr, bool value)
+{
+	led_set_internal(ptr, value);
+	ptr->pulse_mode = false;
 }
 
 void led_update(struct led_t *ptr)
@@ -55,8 +61,8 @@ void led_update(struct led_t *ptr)
 		return;
 	
 	ms_t now = ms_now();
-	if (now < ptr->state_since + ptr->pulse_half_period)
-		led_set(ptr, !ptr->state);
+	if (now >= ptr->state_since + ptr->pulse_half_period)
+		led_set_internal(ptr, !ptr->state);
 }
 
 void led_set_pulse(struct led_t *ptr, ms_t pulse_half_period)
