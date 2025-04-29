@@ -317,6 +317,11 @@ static void packet_handler (uint8_t packet_type, uint16_t channel, uint8_t *pack
 	}
 }
 
+void bluetooth_disconnect()
+{
+	gap_disconnect(con_handle);
+}
+
 int btstack_main(volatile int* hog_state)
 {
 	print_timestamp();

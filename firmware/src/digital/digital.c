@@ -110,9 +110,11 @@ bool digital_went_false(struct digital_t *ptr)
 	return ret;
 }
 
-ms_t digital_ms(struct digital_t *ptr)
+bool digital_held_true(struct digital_t *ptr, ms_t at_least)
 {
-	ms_t ret = ptr->held_for;
+	if (at_least > ptr->held_for)
+		return false;
+	
 	ptr->held_for = 0;
-	return ret;
+	return true;
 }

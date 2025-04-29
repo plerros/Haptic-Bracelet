@@ -41,6 +41,6 @@ bool digital_went_true(struct digital_t *ptr);
  */
 bool digital_went_false(struct digital_t *ptr);
 
-ms_t digital_ms(struct digital_t *ptr);
+bool digital_held_true(struct digital_t *ptr, ms_t at_least);
 
 #endif /* HAPTIC_BRACELET_FIRMWARE_DIGITAL_H */

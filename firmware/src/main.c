@@ -13,6 +13,8 @@
 #include "pico/stdlib.h"
 #include "pico/time.h"
 
+#include "btstack.h"
+
 // Config Files
 #include "config.h"
 #include "config_adv.h"
@@ -23,6 +25,9 @@
 #include "bluetooth_states.h"
 #include "led.h"
 #include "motor.h"
+
+extern int btstack_main(volatile int* hog_state);
+extern void bluetooth_disconnect();
 
 struct bracelet_t {
 	// On board
@@ -299,6 +304,24 @@ bool timer_callback(__unused repeating_timer_t *rt)
 	}
 
 	bracelet_pulse(&bracelet);
+	/*
+	 * Pi pico CYW43 reset bug?
+	 * I'm disabling this code since it does nothing.
+	 */
+
+	/*
+	if (digital_held_true(bracelet.button_pair, 3000)) {
+		// I have no idea if this is correct.
+		PRINTF("Attempting reset\n");
+		bluetooth_disconnect();
+		hci_power_control(HCI_POWER_OFF);
+		for (int i = 0; i < le_device_db_max_count(); i++)
+			le_device_db_remove(i);
+		sleep_ms(3000);
+		hci_power_control(HCI_POWER_ON);
+
+	}
+	*/
 
 	#if MEASURE_CALLBACK_TIME
 	us_t time_difference = us_now() - start;
@@ -309,7 +332,6 @@ bool timer_callback(__unused repeating_timer_t *rt)
 	return true;
 }
 
-extern int btstack_main(volatile int* hog_state);
 int main()
 {
 	struct motor_parameters_t motor_parameters = {
