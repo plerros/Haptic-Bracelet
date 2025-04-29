@@ -330,4 +330,8 @@ int main()
 	
 	btstack_main(&(bracelet.hog_state));
 	test_battery(&bracelet);
+
+	// Don't end execution if everything else finishes.
+	while (1)
+		sleep_ms(10000);
 }
