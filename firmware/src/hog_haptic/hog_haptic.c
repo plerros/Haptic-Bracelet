@@ -191,82 +191,81 @@ static inline void print_ble()
 	PRINTF("[BLE] ");
 }
 
-static void packet_handler (uint8_t packet_type, uint16_t channel, uint8_t *packet, uint16_t size)
+static inline void hci_event_packet_handler (uint8_t *packet)
 {
-	UNUSED(channel);
-	UNUSED(size);
-
 	uint16_t conn_interval;
 
-	if (packet_type != HCI_EVENT_PACKET) return;
-
 	switch (hci_event_packet_get_type(packet)) {
+		case HCI_EVENT_COMMAND_COMPLETE:
+			PRINTF("Command Complete\n");
+			break;
 		case HCI_EVENT_DISCONNECTION_COMPLETE:
 			con_handle = HCI_CON_HANDLE_INVALID;
-			print_timestamp();
-			print_ble();
 			PRINTF("Disconnected\n");
 			*state = bt_disconnected;
 			break;
+		case HCI_EVENT_ENCRYPTION_CHANGE:
+			PRINTF("Encryption change\n");
+			break;
+		case HCI_EVENT_NUMBER_OF_COMPLETED_PACKETS:
+			PRINTF("Number of completed packets\n");
+			break;
+		case HCI_EVENT_TRANSPORT_PACKET_SENT:
+			PRINTF("Packet Sent\n");
+			break;
+		case SM_EVENT_IDENTITY_RESOLVING_STARTED:
+			PRINTF("[SM] Identity resolving\n");
+			break;
 		case SM_EVENT_JUST_WORKS_REQUEST:
-			print_timestamp();
-			print_ble();
-			PRINTF("Just Works requested\n");
+			PRINTF("[SM] Just Works requested\n");
 			sm_just_works_confirm(sm_event_just_works_request_get_handle(packet));
 			break;
 		case SM_EVENT_NUMERIC_COMPARISON_REQUEST:
-			print_timestamp();
-			print_ble();
-			PRINTF("Confirming numeric comparison: %"PRIu32"\n", sm_event_numeric_comparison_request_get_passkey(packet));
+			PRINTF("[SM] Confirming numeric comparison: %"PRIu32"\n", sm_event_numeric_comparison_request_get_passkey(packet));
 			sm_numeric_comparison_confirm(sm_event_passkey_display_number_get_handle(packet));
 			break;
 		case SM_EVENT_PASSKEY_DISPLAY_NUMBER:
-			print_timestamp();
-			print_ble();
-			PRINTF("Display Passkey: %"PRIu32"\n", sm_event_passkey_display_number_get_passkey(packet));
+			PRINTF("[SM] Display Passkey: %"PRIu32"\n", sm_event_passkey_display_number_get_passkey(packet));
 			break;
 		case L2CAP_EVENT_CONNECTION_PARAMETER_UPDATE_RESPONSE:
-			print_timestamp();
-			print_ble();
-			PRINTF("L2CAP Connection Parameter Update Complete, response: %x\n", l2cap_event_connection_parameter_update_response_get_result(packet));
+			PRINTF("[L2CAP] Connection Parameter Update Complete, response: %x\n", l2cap_event_connection_parameter_update_response_get_result(packet));
 			break;
 		case HCI_EVENT_META_GAP:
+			PRINTF("[GAP] ");
 			switch (hci_event_gap_meta_get_subevent_code(packet)) {
 				case GAP_SUBEVENT_LE_CONNECTION_COMPLETE:
 					// print connection parameters (without using float operations)
-					conn_interval = gap_subevent_le_connection_complete_get_conn_interval(packet);
-					print_timestamp();
-					print_ble();
+					conn_interval = gap_subevent_le_connection_complete_get_conn_interval(packet);\
 					PRINTF("LE Connection Complete:\n");
 					PRINTF("- Connection Interval: %u.%02u ms\n", conn_interval * 125 / 100, 25 * (conn_interval & 3));
 					PRINTF("- Connection Latency: %u\n", gap_subevent_le_connection_complete_get_conn_latency(packet));
 					*state = bt_connected;
 					break;
 				default:
+					PRINTF("Other %02X\n", hci_event_gap_meta_get_subevent_code(packet));
 					break;
 			}
 			break;
 		case HCI_EVENT_LE_META:
+			PRINTF("[LE] ");
 			switch (hci_event_le_meta_get_subevent_code(packet)) {
 				case HCI_SUBEVENT_LE_CONNECTION_UPDATE_COMPLETE:
 					// print connection parameters (without using float operations)
 					conn_interval = hci_subevent_le_connection_update_complete_get_conn_interval(packet);
-					print_timestamp();
-					print_ble();
 					PRINTF("LE Connection Update: \n");
 					PRINTF("- Connection Interval: %u.%02u ms\n", conn_interval * 125 / 100, 25 * (conn_interval & 3));
 					PRINTF("- Connection Latency: %u\n", hci_subevent_le_connection_update_complete_get_conn_latency(packet));
 					break;
 				default:
+					PRINTF("Other %02X\n", hci_event_le_meta_get_subevent_code(packet));
 					break;
 			}
 			break;
 		case HCI_EVENT_HIDS_META:
+			PRINTF("[HIDS] ");
 			switch (hci_event_hids_meta_get_subevent_code(packet)) {
 				case HIDS_SUBEVENT_INPUT_REPORT_ENABLE:
 					con_handle = hids_subevent_input_report_enable_get_con_handle(packet);
-					print_timestamp();
-					print_ble();
 					PRINTF("Report Characteristic Subscribed %u\n", hids_subevent_input_report_enable_get_enable(packet));
 
 					// request connection param update via L2CAP following Apple Bluetooth Design Guidelines
@@ -280,19 +279,40 @@ static void packet_handler (uint8_t packet_type, uint16_t channel, uint8_t *pack
 				// ...
 				case HIDS_SUBEVENT_PROTOCOL_MODE:
 					protocol_mode = hids_subevent_protocol_mode_get_con_handle(packet);
-					print_timestamp();
-					print_ble();
 					PRINTF("Protocol Mode: %s mode\n", hids_subevent_protocol_mode_get_protocol_mode(packet) ? "Report" : "Boot");
 					break;
 				case HIDS_SUBEVENT_CAN_SEND_NOW:
 					haptics_can_send_now();
+					PRINTF("can send now\n");
 					break;
 				default:
+					PRINTF("Other %02X\n", hci_event_hids_meta_get_subevent_code(packet));
 					break;
 			}
 			break;
 
 		default:
+			PRINTF("[?] ");
+			PRINTF("Other %02X\n", hci_event_packet_get_type(packet));
+			break;
+	}
+}
+
+static void packet_handler (uint8_t packet_type, uint16_t channel, uint8_t *packet, uint16_t size)
+{
+	UNUSED(channel);
+	UNUSED(size);
+
+	print_timestamp();
+	print_ble();
+
+	switch (packet_type) {
+		case HCI_EVENT_PACKET:
+			PRINTF("[HCI_EVENT] ");
+			hci_event_packet_handler(packet);
+			break;
+		default:
+			PRINTF("Other %02X\n", packet_type);
 			break;
 	}
 }
