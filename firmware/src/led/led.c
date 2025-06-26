@@ -14,12 +14,12 @@
 
 struct led_t {
 	uint  pin;
-	volatile bool state; // true == ON, false == OFF
-	volatile ms_t state_since;
+	volatile bool _Atomic state; // true == ON, false == OFF
+	volatile ms_t _Atomic state_since;
 
 	// External
-	volatile bool pulse_mode;
-	volatile ms_t pulse_half_period;
+	volatile bool _Atomic pulse_mode;
+	volatile ms_t _Atomic pulse_half_period;
 };
 #include <stdio.h>
 

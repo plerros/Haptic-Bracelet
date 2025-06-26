@@ -60,8 +60,8 @@ pico_sdk_init()
 add_executable(firmware
     src/main.c
     src/analog/analog.c
+    src/bluetooth/btstack_main.c
     src/digital/digital.c
-    src/hog_haptic/hog_haptic.c
     src/led/led.c
     src/motor/motor.c
     src/npf_interface/npf_interface.c)
@@ -78,6 +78,7 @@ target_link_libraries(firmware
     hardware_adc
     hardware_gpio
     hardware_pwm
+    pico_btstack_classic
     pico_btstack_ble
     pico_btstack_cyw43
     pico_cyw43_arch_none
@@ -89,8 +90,8 @@ target_include_directories(firmware PRIVATE
     .
     src
     src/analog
+    src/bluetooth
     src/digital
-    src/hog_haptic
     src/led
     src/motor
     src/npf_interface

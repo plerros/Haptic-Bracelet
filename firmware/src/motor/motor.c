@@ -23,9 +23,9 @@ struct motor_t {
 	ms_t reverse_ms;		// ms to run reverse
 	ms_t brake_ms;			// ms to brake
 
-	volatile int state;		// Current state
-	volatile ms_t time_next;	// Timestamp to next state
-	volatile ms_t last_activation;	// Last time update function was called
+	volatile _Atomic int state;		// Current state
+	volatile _Atomic ms_t time_next;	// Timestamp to next state
+	volatile _Atomic ms_t last_activation;	// Last time update function was called
 };
 
 static inline void motor_pwm(
@@ -141,6 +141,7 @@ void motor_pulse(struct motor_t *ptr, ms_t ms)
 	if (ptr->state != motor_asleep)
 		return;
 
+	ptr->state++;
 	// Dampen activation if multiple happen consecutively.
 	ms_t now = ms_now();
 	if (ms > 10 && now - ptr->last_activation < 200)
@@ -159,5 +160,4 @@ void motor_pulse(struct motor_t *ptr, ms_t ms)
 	ptr->time_next = now + ms;
 
 	motor_pwm(ptr, ptr->parameters.pwm, 0);
-	ptr->state++;
 }

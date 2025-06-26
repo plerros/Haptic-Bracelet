@@ -20,13 +20,13 @@ struct analog_t {
 	uint pin;
 	uint adc_id;
 
-	volatile adc_t  raw_values[ANALOG_AVERAGING_WINDOW];
-	volatile size_t last_written;
-	volatile uint32_t avg_sum;
+	volatile adc_t    _Atomic raw_values[ANALOG_AVERAGING_WINDOW];
+	volatile size_t   _Atomic last_written;
+	volatile uint32_t _Atomic avg_sum;
 
-	volatile adc_t prev[ap_size];
+	volatile adc_t _Atomic prev[ap_size];
 
-	volatile ms_t  activation1_time;
+	volatile ms_t _Atomic activation1_time;
 	bool           activation2_consumed;
 	// External
 };

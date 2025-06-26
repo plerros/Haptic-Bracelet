@@ -15,14 +15,14 @@
 struct digital_t {
 	uint pin;
 	bool invert;
-	volatile bool prev;
-	volatile ms_t held_since;
+	volatile bool _Atomic prev;
+	volatile ms_t _Atomic held_since;
 
 	// External
-	volatile bool trap;
-	volatile bool went_true;
-	volatile bool went_false;
-	volatile ms_t held_for;
+	volatile bool _Atomic trap;
+	volatile bool _Atomic went_true;
+	volatile bool _Atomic went_false;
+	volatile ms_t _Atomic held_for;
 };
 
 void digital_new(struct digital_t **ptr, uint pin, int type)
